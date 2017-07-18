@@ -7,22 +7,13 @@
         android:id="@+id/iv_bg"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="fitCenter" />
+        android:scaleType="fitCenter"
+        android:background="#55000000" />
 
     <FrameLayout
+        android:id="@+id/content_container"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/iv_bg"
-        android:layout_alignLeft="@id/iv_bg"
-        android:layout_alignRight="@id/iv_bg"
-        android:layout_alignTop="@id/iv_bg">
-
-        <FrameLayout
-            android:id="@+id/content_container"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-    </FrameLayout>
+        android:layout_height="wrap_content" />
 
     <Button
         android:id="@+id/btn_change_bg"

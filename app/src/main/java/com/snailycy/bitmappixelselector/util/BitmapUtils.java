@@ -13,6 +13,7 @@ import java.util.TreeSet;
  */
 public class BitmapUtils {
     private static final String TAG = "BitmapUtils";
+    private static final int TOLERANCE_PIXEL_NUM = 20;
 
     /**
      * 获取bitmap指定颜色的连续区域
@@ -20,7 +21,7 @@ public class BitmapUtils {
      * @param bitmap
      * @return BitmapPoint数组，BitmapPoint[0]选择区域左上角坐标，BitmapPoint[1]选择区域右下角坐标
      */
-    public static BitmapPoint[] getContentFromBitmap(@NonNull Bitmap bitmap) {
+    public static BitmapPoint[] getContentFromBitmap(@NonNull Bitmap bitmap) throws Exception {
         // 获取指定区域颜色范围
         int[] baseColorRange = getCenterColorRange(bitmap);
         int bitmapW = bitmap.getWidth();
@@ -28,7 +29,7 @@ public class BitmapUtils {
         BitmapPoint leftTopPoint = new BitmapPoint();
         BitmapPoint rightBottomPoint = new BitmapPoint();
         // 获取左上角坐标x值
-        for (int x = bitmapW / 2; x >= 0; x--) {
+        for (int x = bitmapW / 2; x > 0; x--) {
             int color = bitmap.getPixel(x, bitmapH / 2);
             if (color >= baseColorRange[0] && color <= baseColorRange[1]) {
                 leftTopPoint.setX(x);
@@ -37,7 +38,7 @@ public class BitmapUtils {
             }
         }
         // 获取右下角坐标x值
-        for (int x = bitmapW / 2; x <= bitmapW; x++) {
+        for (int x = bitmapW / 2; x < bitmapW; x++) {
             int color = bitmap.getPixel(x, bitmapH / 2);
             if (color >= baseColorRange[0] && color <= baseColorRange[1]) {
                 rightBottomPoint.setX(x);
@@ -47,12 +48,12 @@ public class BitmapUtils {
         }
         int baseColorPixelCount = getPixelCount(bitmap, baseColorRange, bitmapH / 2);
         // 获取左上角坐标y值
-        for (int y = bitmapH / 2; y >= 0; y--) {
+        for (int y = bitmapH / 2; y > 0; y--) {
             int color = bitmap.getPixel(bitmapW / 2, y);
             if (color >= baseColorRange[0] && color <= baseColorRange[1]) {
                 int pixelCount = getPixelCount(bitmap, baseColorRange, y);
                 // 容错10个像素点
-                if (Math.abs(pixelCount - baseColorPixelCount) < 10) {
+                if (Math.abs(pixelCount - baseColorPixelCount) < TOLERANCE_PIXEL_NUM) {
                     leftTopPoint.setY(y);
                 } else {
                     break;
@@ -62,12 +63,12 @@ public class BitmapUtils {
             }
         }
         // 获取右下角坐标y值
-        for (int y = bitmapH / 2; y <= bitmapH; y++) {
+        for (int y = bitmapH / 2; y < bitmapH; y++) {
             int color = bitmap.getPixel(bitmapW / 2, y);
             if (color >= baseColorRange[0] && color <= baseColorRange[1]) {
                 int pixelCount = getPixelCount(bitmap, baseColorRange, y);
                 // 容错10个像素点
-                if (Math.abs(pixelCount - baseColorPixelCount) < 10) {
+                if (Math.abs(pixelCount - baseColorPixelCount) < TOLERANCE_PIXEL_NUM) {
                     rightBottomPoint.setY(y);
                 } else {
                     break;
