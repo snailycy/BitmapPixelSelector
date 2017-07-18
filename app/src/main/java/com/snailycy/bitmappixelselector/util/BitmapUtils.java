@@ -37,44 +37,51 @@ public class BitmapUtils {
                 break;
             }
         }
+        int baseColorPixelCountByX = getPixelCountByX(bitmap, baseColorRange, leftTopPoint.getX());
         // 获取右下角坐标x值
         for (int x = bitmapW / 2; x < bitmapW; x++) {
             int color = bitmap.getPixel(x, bitmapH / 2);
             if (color >= baseColorRange[0] && color <= baseColorRange[1]) {
-                rightBottomPoint.setX(x);
+                int pixelCount = getPixelCountByX(bitmap, baseColorRange, x);
+                if (baseColorPixelCountByX - pixelCount < 8 * TOLERANCE_PIXEL_NUM) {
+                    rightBottomPoint.setX(x);
+                } else {
+                    break;
+                }
             } else {
-                break;
+                // 尝试跳过障碍点是否还是内容区域
+                x += TOLERANCE_PIXEL_NUM;
             }
         }
-        int baseColorPixelCount = getPixelCount(bitmap, baseColorRange, bitmapH / 2);
+        int baseColorPixelCountByY = getPixelCountByY(bitmap, baseColorRange, bitmapH / 2);
         // 获取左上角坐标y值
         for (int y = bitmapH / 2; y > 0; y--) {
             int color = bitmap.getPixel(bitmapW / 2, y);
             if (color >= baseColorRange[0] && color <= baseColorRange[1]) {
-                int pixelCount = getPixelCount(bitmap, baseColorRange, y);
-                // 容错10个像素点
-                if (Math.abs(pixelCount - baseColorPixelCount) < TOLERANCE_PIXEL_NUM) {
+                int pixelCount = getPixelCountByY(bitmap, baseColorRange, y);
+                if (baseColorPixelCountByY - pixelCount < 5 * TOLERANCE_PIXEL_NUM) {
                     leftTopPoint.setY(y);
                 } else {
                     break;
                 }
             } else {
-                break;
+                // 尝试跳过障碍点是否还是内容区域
+                y -= TOLERANCE_PIXEL_NUM;
             }
         }
         // 获取右下角坐标y值
         for (int y = bitmapH / 2; y < bitmapH; y++) {
             int color = bitmap.getPixel(bitmapW / 2, y);
             if (color >= baseColorRange[0] && color <= baseColorRange[1]) {
-                int pixelCount = getPixelCount(bitmap, baseColorRange, y);
-                // 容错10个像素点
-                if (Math.abs(pixelCount - baseColorPixelCount) < TOLERANCE_PIXEL_NUM) {
+                int pixelCount = getPixelCountByY(bitmap, baseColorRange, y);
+                if (Math.abs(pixelCount - baseColorPixelCountByY) < 5 * TOLERANCE_PIXEL_NUM) {
                     rightBottomPoint.setY(y);
                 } else {
                     break;
                 }
             } else {
-                break;
+                // 尝试跳过障碍点是否还是内容区域
+                y += TOLERANCE_PIXEL_NUM;
             }
         }
 
@@ -122,17 +129,31 @@ public class BitmapUtils {
      * @param y
      * @return
      */
-    private static int getPixelCount(Bitmap bitmap, int[] baseColorRangle, int y) {
+    private static int getPixelCountByY(Bitmap bitmap, int[] baseColorRangle, int y) {
         int pixelCount = 0;
         int bitmapW = bitmap.getWidth();
-        for (int x1 = bitmapW / 2; x1 > 0; x1--) {
-            int color = bitmap.getPixel(x1, y);
+        for (int x = 0; x < bitmapW; x++) {
+            int color = bitmap.getPixel(x, y);
             if (color >= baseColorRangle[0] && color <= baseColorRangle[1]) {
                 pixelCount++;
             }
         }
-        for (int x2 = bitmapW / 2; x2 < bitmapW; x2++) {
-            int color = bitmap.getPixel(x2, y);
+        return pixelCount;
+    }
+
+    /**
+     * 根据指定颜色范围，指定坐标x，获取bitmap一列的像素点数量
+     *
+     * @param bitmap
+     * @param baseColorRangle
+     * @param x
+     * @return
+     */
+    private static int getPixelCountByX(Bitmap bitmap, int[] baseColorRangle, int x) {
+        int pixelCount = 0;
+        int bitmapH = bitmap.getHeight();
+        for (int y = 0; y < bitmapH; y++) {
+            int color = bitmap.getPixel(x, y);
             if (color >= baseColorRangle[0] && color <= baseColorRangle[1]) {
                 pixelCount++;
             }
